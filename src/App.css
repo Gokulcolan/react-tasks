@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +35,24 @@
   to {
     transform: rotate(360deg);
   }
+} */
+
+.inputField {
+  height: "20px";
+}
+
+.btn {
+  background-color: none !important;
+  color: rgb(65 180 148) !important;
+  border-bottom: 1px solid rgb(65 180 148) !important;
+}
+
+.saveBtn {
+  background-color: rgb(65 180 148) !important;
+  color: white !important;
+}
+
+.cancelBtn {
+  background-color: white !important;
+  color: red !important;
 }
