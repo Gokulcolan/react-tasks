@@ -19,21 +19,17 @@ import axios from "axios";
 
 export default function InputModal() {
   const [open, setOpen] = useState(false);
-  const [segmentName, setSegmentName] = useState();
+  const [segmentName, setSegmentName] = useState("");
   const [schemaValue, setSchemaValue] = useState("");
   const [newSchema, setNewSchema] = useState([]);
   const [dropDownData, setDropDownData] = useState(DropDownData);
-
-  console.log(dropDownData, "dropDownData");
-  console.log(newSchema, "newSchema");
-  console.log(schemaValue, "schemaValue");
 
   const handleGetValue = (e) => {
     setSegmentName(e.target.value);
   };
 
   const handleChange = (event) => {
-    console.log(event,"e");
+    console.log(event, "e");
     setSchemaValue(event.target.value);
   };
 
@@ -64,7 +60,21 @@ export default function InputModal() {
 
   const handleClose = () => {
     setOpen(false);
+    setSegmentName("");
+    setSchemaValue("");
+    setNewSchema([]);
+    setDropDownData(DropDownData);
   };
+
+  let filteredData = DropDownData.filter((e) =>
+    newSchema.some((val) => val == e.Value)
+  );
+
+  let schemaArray = filteredData?.map((val) => {
+    return {
+      [val.Value]: val.Label,
+    };
+  });
 
   // iam not able to send data to server its getting cors error
 
@@ -75,11 +85,8 @@ export default function InputModal() {
       "https://webhook.site/f489121b-82ac-42a1-a33d-ba8909f6e6fb";
 
     const data = {
-      // segment_name: segmentName,
-      // schema: newSchema.map((item) => ({ [item]: item })),
-
-      segment_name: "react task",
-      schema: [{ first_name: "First name" }, { last_name: "Last name" }],
+      segment_name: segmentName,
+      schema: schemaArray,
     };
 
     axios
