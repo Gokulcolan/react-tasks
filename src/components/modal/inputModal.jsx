@@ -15,16 +15,25 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { DropDownData } from "../common/commonData";
+import axios from "axios";
 
 export default function InputModal() {
-  const [open, setOpen] = React.useState(false);
-  const [schemaValue, setSchemaValue] = React.useState("");
+  const [open, setOpen] = useState(false);
+  const [segmentName, setSegmentName] = useState();
+  const [schemaValue, setSchemaValue] = useState("");
   const [newSchema, setNewSchema] = useState([]);
   const [dropDownData, setDropDownData] = useState(DropDownData);
 
+  console.log(dropDownData, "dropDownData");
+  console.log(newSchema, "newSchema");
   console.log(schemaValue, "schemaValue");
 
+  const handleGetValue = (e) => {
+    setSegmentName(e.target.value);
+  };
+
   const handleChange = (event) => {
+    console.log(event,"e");
     setSchemaValue(event.target.value);
   };
 
@@ -32,7 +41,10 @@ export default function InputModal() {
     if (schemaValue !== "") {
       setNewSchema([...newSchema, schemaValue]);
       setDropDownData(
-        dropDownData.filter((option) => option.Value !== schemaValue)
+        dropDownData.filter((option) => {
+          console.log(option, "option");
+          return option.Value !== schemaValue;
+        })
       );
       setSchemaValue("");
     } else {
@@ -51,40 +63,46 @@ export default function InputModal() {
   };
 
   const handleClose = () => {
-    // setOpen(false);
+    setOpen(false);
   };
 
+  // iam not able to send data to server its getting cors error
+
   const handleSave = () => {
+    // this webhookUrl iam generated from your reference site
+
+    const webhookUrl =
+      "https://webhook.site/f489121b-82ac-42a1-a33d-ba8909f6e6fb";
+
     const data = {
-      segment_name: "last_10_days_blog_visits",
+      // segment_name: segmentName,
       // schema: newSchema.map((item) => ({ [item]: item })),
+
+      segment_name: "react task",
       schema: [{ first_name: "First name" }, { last_name: "Last name" }],
     };
-    console.log(data, "data");
 
-    fetch("https://webhook.site/f489121b-82ac-42a1-a33d-ba8909f6e6fb", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        handleClose(); // Close the dialog after successfully sending data
+    axios
+      .post(webhookUrl, data)
+      .then((response) => {
+        console.log("Data sent successfully", response.data);
       })
       .catch((error) => {
-        console.error("Error:", error);
-        // Handle error
+        console.error("Error sending data", error);
       });
   };
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Save segment
-      </Button>
+      <div className="btnContainer">
+        <Button
+          variant="outlined"
+          onClick={handleClickOpen}
+          className="mainBtn"
+        >
+          Save segment
+        </Button>
+      </div>
       <Dialog
         open={open}
         onClose={handleClose}
@@ -100,13 +118,13 @@ export default function InputModal() {
           label="Segment Name"
           type="text"
           sx={{ width: "250px", margin: "0px 20px" }}
+          onChange={handleGetValue}
         />
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             To save your segment you need to add the schemas to build the query
           </DialogContentText>
         </DialogContent>
-        <br />
 
         {newSchema !== ""
           ? newSchema?.map((val, index) => (
@@ -130,7 +148,7 @@ export default function InputModal() {
                       handleNewChange(e, index);
                     }}
                   >
-                    {DropDownData.map((option, index) => (
+                    {DropDownData?.map((option, index) => (
                       <MenuItem key={index} value={option.Value}>
                         {option.Label}
                       </MenuItem>
@@ -140,8 +158,8 @@ export default function InputModal() {
               </Box>
             ))
           : null}
-
         <br />
+
         <Box sx={{ width: "250px", marginLeft: "20px" }}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">
